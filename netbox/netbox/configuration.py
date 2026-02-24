@@ -10,7 +10,10 @@ from urllib.parse import urlparse
 #   Required settings   #
 #########################
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+_allowed_hosts = os.environ.get('ALLOWED_HOSTS', '').split(',')
+# Always allow Railway's internal healthcheck IP range (100.64.x.x)
+# Without this Django returns HTTP 400 to the healthchecker and the deploy fails.
+ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts if h.strip()] + ['100.64.0.2', '.railway.internal']
 
 # Parse DATABASE_URL from Railway PostgreSQL add-on
 # Format: postgresql://user:password@host:port/dbname
