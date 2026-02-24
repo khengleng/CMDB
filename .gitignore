@@ -20,6 +20,8 @@ yarn-error.log*
 /venv/
 /*.sh
 !docker-entrypoint.sh
+!worker-entrypoint.sh
+!housekeeping-entrypoint.sh
 local_requirements.txt
 !local_requirements.txt
 local_settings.py

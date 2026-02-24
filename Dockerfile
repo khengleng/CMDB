@@ -39,9 +39,9 @@ RUN SECRET_KEY="build-only-dummy-secret-key-that-is-at-least-fifty-characters-lo
     DATABASE_URL="postgresql://localhost/netbox" \
     python manage.py collectstatic --no-input 2>/dev/null || true
 
-# Copy entrypoint and set permissions
-COPY docker-entrypoint.sh /opt/netbox/docker-entrypoint.sh
-RUN chmod +x /opt/netbox/docker-entrypoint.sh
+# Copy all entrypoints (web + worker + housekeeping share the same image)
+COPY docker-entrypoint.sh worker-entrypoint.sh housekeeping-entrypoint.sh /opt/netbox/
+RUN chmod +x /opt/netbox/docker-entrypoint.sh /opt/netbox/worker-entrypoint.sh /opt/netbox/housekeeping-entrypoint.sh
 
 # Ensure netbox user owns the app directory (needed for writing logs, media, etc.)
 RUN chown -R netbox:netbox /opt/netbox
