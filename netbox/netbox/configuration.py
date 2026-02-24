@@ -90,8 +90,16 @@ else:
 
 SECRET_KEY = os.environ.get('SECRET_KEY', '')
 
-# API Token Peppers (optional but recommended for v2 tokens)
-API_TOKEN_PEPPERS = {}
+# API Token Peppers (required for v2 tokens)
+# Derive peppers from SECRET_KEY so they stay stable across restarts
+import hashlib
+if SECRET_KEY:
+    _pepper_hash = hashlib.sha256(SECRET_KEY.encode()).hexdigest()
+    API_TOKEN_PEPPERS = {
+        1: _pepper_hash[:32],
+    }
+else:
+    API_TOKEN_PEPPERS = {}
 
 
 #########################
@@ -101,7 +109,7 @@ API_TOKEN_PEPPERS = {}
 # Base URL path (if running behind a reverse proxy at a subpath)
 BASE_PATH = os.environ.get('BASE_PATH', '')
 
-CORS_ORIGIN_ALLOW_ALL = os.environ.get('CORS_ORIGIN_ALLOW_ALL', 'true').lower() == 'true'
+CORS_ORIGIN_ALLOW_ALL = os.environ.get('CORS_ORIGIN_ALLOW_ALL', 'false').lower() == 'true'
 CORS_ORIGIN_WHITELIST = list(filter(None, os.environ.get('CORS_ORIGIN_WHITELIST', '').split(',')))
 
 CSRF_COOKIE_SECURE = os.environ.get('CSRF_COOKIE_SECURE', 'true').lower() == 'true'

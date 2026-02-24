@@ -15,15 +15,14 @@ python manage.py reindex --lazy || true
 # Create superuser from env vars if provided
 if [ -n "$SUPERUSER_NAME" ] && [ -n "$SUPERUSER_EMAIL" ] && [ -n "$SUPERUSER_PASSWORD" ]; then
     echo "==> Creating/updating superuser..."
-    python manage.py shell -c "
-from django.contrib.auth import get_user_model
-User = get_user_model()
-if not User.objects.filter(username='${SUPERUSER_NAME}').exists():
-    User.objects.create_superuser('${SUPERUSER_NAME}', '${SUPERUSER_EMAIL}', '${SUPERUSER_PASSWORD}')
-    print('Superuser created: ${SUPERUSER_NAME}')
-else:
-    print('Superuser already exists: ${SUPERUSER_NAME}')
-"
+    # Use Django's built-in --noinput flag which reads DJANGO_SUPERUSER_PASSWORD
+    # from env. This avoids shell injection from special characters in passwords.
+    export DJANGO_SUPERUSER_PASSWORD="$SUPERUSER_PASSWORD"
+    python manage.py createsuperuser --no-input \
+        --username "$SUPERUSER_NAME" \
+        --email "$SUPERUSER_EMAIL" 2>/dev/null || \
+        echo "Superuser already exists: $SUPERUSER_NAME"
+    unset DJANGO_SUPERUSER_PASSWORD
 fi
 
 echo "==> Collecting static files..."
