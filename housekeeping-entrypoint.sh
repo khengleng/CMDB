@@ -14,9 +14,11 @@ while true; do
     echo "  -> Clearing expired sessions..."
     python manage.py clearsessions 2>/dev/null || true
 
-    # Remove stale content types
-    echo "  -> Removing stale content types..."
-    python manage.py remove_stale_contenttypes --no-input 2>/dev/null || true
+    if [ "${REMOVE_STALE_CONTENTTYPES:-false}" = "true" ]; then
+        # Remove stale content types
+        echo "  -> Removing stale content types..."
+        python manage.py remove_stale_contenttypes --no-input 2>/dev/null || true
+    fi
 
     # Clean up expired object changes (changelog) older than configured retention
     echo "  -> Cleaning up old change log entries..."

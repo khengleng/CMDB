@@ -2,15 +2,29 @@
 NetBox configuration for Railway.com deployment.
 All settings are read from environment variables.
 """
+import hashlib
 import os
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse, urlunparse
+
+
+def _split_csv(value):
+    return [item.strip() for item in value.split(',') if item.strip()]
+
+
+def _decode_url_component(value):
+    return unquote(value) if value else ''
+
+
+def _with_redis_db(url, db_index):
+    parsed = urlparse(url)
+    return urlunparse(parsed._replace(path=f'/{db_index}'))
 
 
 #########################
 #   Required settings   #
 #########################
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+ALLOWED_HOSTS = _split_csv(os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,[::1]'))
 
 # Parse DATABASE_URL from Railway PostgreSQL add-on
 # Format: postgresql://user:password@host:port/dbname
@@ -20,8 +34,8 @@ if DATABASE_URL:
     DATABASE = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': db_url.path[1:],  # Remove leading '/'
-        'USER': db_url.username or '',
-        'PASSWORD': db_url.password or '',
+        'USER': _decode_url_component(db_url.username),
+        'PASSWORD': _decode_url_component(db_url.password),
         'HOST': db_url.hostname or 'localhost',
         'PORT': str(db_url.port or 5432),
         'CONN_MAX_AGE': 300,
@@ -42,15 +56,17 @@ else:
 REDIS_URL = os.environ.get('REDIS_URL', '')
 if REDIS_URL:
     redis_url = urlparse(REDIS_URL)
+    tasks_redis_url = _with_redis_db(REDIS_URL, 0)
+    caching_redis_url = _with_redis_db(REDIS_URL, 1)
     redis_host = redis_url.hostname or 'localhost'
     redis_port = redis_url.port or 6379
-    redis_password = redis_url.password or ''
-    redis_username = redis_url.username or ''
+    redis_password = _decode_url_component(redis_url.password)
+    redis_username = _decode_url_component(redis_url.username)
     redis_ssl = redis_url.scheme == 'rediss'
 
     REDIS = {
         'tasks': {
-            'URL': REDIS_URL,
+            'URL': tasks_redis_url,
             'HOST': redis_host,
             'PORT': redis_port,
             'USERNAME': redis_username,
@@ -59,7 +75,7 @@ if REDIS_URL:
             'SSL': redis_ssl,
         },
         'caching': {
-            'URL': REDIS_URL.replace('/0', '/1') if '/0' in REDIS_URL else REDIS_URL,
+            'URL': caching_redis_url,
             'HOST': redis_host,
             'PORT': redis_port,
             'USERNAME': redis_username,
@@ -93,7 +109,6 @@ SECRET_KEY = os.environ.get('SECRET_KEY', '')
 # API Token Peppers (required for v2 tokens)
 # Derive peppers from SECRET_KEY so they stay stable across restarts.
 # NetBox requires each pepper to be >= 50 characters; SHA-256 hex = 64 chars.
-import hashlib
 if SECRET_KEY:
     _pepper_hash = hashlib.sha256(SECRET_KEY.encode()).hexdigest()  # 64 chars
     API_TOKEN_PEPPERS = {
