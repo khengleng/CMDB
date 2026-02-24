@@ -91,12 +91,13 @@ else:
 SECRET_KEY = os.environ.get('SECRET_KEY', '')
 
 # API Token Peppers (required for v2 tokens)
-# Derive peppers from SECRET_KEY so they stay stable across restarts
+# Derive peppers from SECRET_KEY so they stay stable across restarts.
+# NetBox requires each pepper to be >= 50 characters; SHA-256 hex = 64 chars.
 import hashlib
 if SECRET_KEY:
-    _pepper_hash = hashlib.sha256(SECRET_KEY.encode()).hexdigest()
+    _pepper_hash = hashlib.sha256(SECRET_KEY.encode()).hexdigest()  # 64 chars
     API_TOKEN_PEPPERS = {
-        1: _pepper_hash[:32],
+        1: _pepper_hash,
     }
 else:
     API_TOKEN_PEPPERS = {}
