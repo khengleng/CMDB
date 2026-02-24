@@ -4,7 +4,5 @@ dockerfilePath = "Dockerfile"
 
 [deploy]
 startCommand = "/opt/netbox/docker-entrypoint.sh"
-healthcheckPath = "/login/"
-healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
