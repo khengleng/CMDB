@@ -21,6 +21,7 @@ yarn-error.log*
 /*.sh
 !docker-entrypoint.sh
 local_requirements.txt
+!local_requirements.txt
 local_settings.py
 !upgrade.sh
 fabfile.py

@@ -19,17 +19,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /opt/netbox
 
 # Copy requirements first for layer caching
-COPY requirements.txt .
+COPY requirements.txt local_requirements.txt ./
 RUN pip install --no-cache-dir --upgrade pip wheel && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir -r local_requirements.txt
 
 # Copy the rest of the application
 COPY . .
 
 WORKDIR /opt/netbox/netbox
 
-# Collect static files (needs a dummy SECRET_KEY)
-RUN SECRET_KEY="dummy-key-for-collectstatic-only-not-for-production" \
+# Collect static files (needs a dummy SECRET_KEY ≥ 50 chars)
+RUN SECRET_KEY="build-only-dummy-secret-key-that-is-at-least-fifty-characters-long-for-collectstatic" \
     ALLOWED_HOSTS="*" \
     REDIS_URL="redis://localhost:6379" \
     DATABASE_URL="postgresql://localhost/netbox" \
