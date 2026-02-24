@@ -27,7 +27,7 @@ else:
 fi
 
 echo "==> Collecting static files..."
-python manage.py collectstatic --no-input
+python manage.py collectstatic --no-input || true
 
 echo "==> Starting Gunicorn on port ${PORT:-8000}..."
 exec gunicorn netbox.wsgi:application \
