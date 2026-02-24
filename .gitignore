@@ -7,6 +7,7 @@ yarn-error.log*
 /netbox/project-static/docs/*
 !/netbox/project-static/docs/.info
 /netbox/netbox/configuration.py
+!/netbox/netbox/configuration.py
 /netbox/netbox/ldap_config.py
 /netbox/local/*
 /netbox/media/*
@@ -18,6 +19,7 @@ yarn-error.log*
 /netbox/static
 /venv/
 /*.sh
+!docker-entrypoint.sh
 local_requirements.txt
 local_settings.py
 !upgrade.sh

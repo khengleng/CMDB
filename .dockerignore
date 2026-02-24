@@ -1,0 +1,10 @@
+# Duplo CMDB (NetBox Fork) — Railway Deployment
+venv/
+*.pyc
+__pycache__/
+.git/
+docs/
+*.md
+.github/
+.tx/
+contrib/openapi.json
