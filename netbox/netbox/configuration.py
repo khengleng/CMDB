@@ -152,6 +152,10 @@ LOGIN_PERSISTENCE = os.environ.get('LOGIN_PERSISTENCE', 'false').lower() == 'tru
 
 METRICS_ENABLED = os.environ.get('METRICS_ENABLED', 'false').lower() == 'true'
 
+# Safety guard for dynamic script execution (extras/scripts & report modules)
+# Set true only in trusted environments where script authors are trusted.
+ALLOW_UNTRUSTED_SCRIPTS = os.environ.get('ALLOW_UNTRUSTED_SCRIPTS', 'false').lower() == 'true'
+
 # Plugins
 PLUGINS = list(filter(None, os.environ.get('PLUGINS', '').split(',')))
 
@@ -159,8 +163,11 @@ SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', 'true').lower() 
 
 TIME_ZONE = os.environ.get('TIME_ZONE', 'UTC')
 
-# Secure headers for Railway (behind proxy)
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# Trust forwarded headers only when explicitly enabled and only behind a trusted proxy.
+TRUST_X_FORWARDED_PROTO = os.environ.get('TRUST_X_FORWARDED_PROTO', 'false').lower() == 'true'
+TRUST_X_FORWARDED_HOST = os.environ.get('TRUST_X_FORWARDED_HOST', 'false').lower() == 'true'
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') if TRUST_X_FORWARDED_PROTO else None
+USE_X_FORWARDED_HOST = TRUST_X_FORWARDED_HOST
 SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'false').lower() == 'true'
 
 # Superuser creation from env vars

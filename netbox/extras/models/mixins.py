@@ -3,6 +3,7 @@ import importlib.util
 import os
 import sys
 
+from django.conf import settings
 from django.core.files.storage import storages
 from django.db import models
 from django.http import HttpResponse
@@ -30,6 +31,11 @@ class CustomStoragesLoader(importlib.abc.Loader):
         return None  # Use default module creation
 
     def exec_module(self, module):
+        if not (settings.ALLOW_UNTRUSTED_SCRIPTS or settings.DEBUG):
+            raise PermissionError(
+                "Execution of custom scripts is disabled. "
+                "Set ALLOW_UNTRUSTED_SCRIPTS=true to enable this feature."
+            )
         with storages["scripts"].open(self.filename, 'rb') as f:
             code = f.read()
         exec(code, module.__dict__)

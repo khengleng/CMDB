@@ -225,6 +225,13 @@ RQ_DEFAULT_TIMEOUT = 300
 # this setting is derived from the installed location.
 # SCRIPTS_ROOT = '/opt/netbox/netbox/scripts'
 
+# Safety guard for dynamic script execution. Leave disabled unless script/report authors are fully trusted.
+ALLOW_UNTRUSTED_SCRIPTS = False
+
+# Trust forwarded headers only when NetBox is behind a trusted reverse proxy that strips spoofed values.
+SECURE_PROXY_SSL_HEADER = None
+USE_X_FORWARDED_HOST = False
+
 # The name to use for the session cookie.
 SESSION_COOKIE_NAME = 'sessionid'
 

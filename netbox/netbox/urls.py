@@ -3,6 +3,7 @@ from django.conf.urls import include
 from django.urls import path
 from django.views.decorators.cache import cache_page
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from rest_framework.permissions import IsAuthenticated
 
 from account.views import LoginView, LogoutView
 from netbox.api.views import APIRootView, AuthenticationCheckView, StatusView
@@ -59,12 +60,20 @@ _patterns = [
     path(
         "api/schema/",
         cache_page(timeout=86400, key_prefix=f"api_schema_{settings.RELEASE.version}")(
-            SpectacularAPIView.as_view()
+            SpectacularAPIView.as_view(permission_classes=[IsAuthenticated])
         ),
         name="schema",
     ),
-    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='api_docs'),
-    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='api_redocs'),
+    path(
+        'api/schema/swagger-ui/',
+        SpectacularSwaggerView.as_view(url_name='schema', permission_classes=[IsAuthenticated]),
+        name='api_docs',
+    ),
+    path(
+        'api/schema/redoc/',
+        SpectacularRedocView.as_view(url_name='schema', permission_classes=[IsAuthenticated]),
+        name='api_redocs',
+    ),
 
     # GraphQL
     path('graphql/', NetBoxGraphQLView.as_view(schema=schema), name='graphql'),

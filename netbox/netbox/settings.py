@@ -151,6 +151,7 @@ PROXY_ROUTERS = getattr(configuration, 'PROXY_ROUTERS', ['utilities.proxy.Defaul
 QUEUE_MAPPINGS = getattr(configuration, 'QUEUE_MAPPINGS', {})
 REDIS = getattr(configuration, 'REDIS')  # Required
 RELEASE_CHECK_URL = getattr(configuration, 'RELEASE_CHECK_URL', None)
+ALLOW_UNTRUSTED_SCRIPTS = getattr(configuration, 'ALLOW_UNTRUSTED_SCRIPTS', False)
 REMOTE_AUTH_AUTO_CREATE_GROUPS = getattr(configuration, 'REMOTE_AUTH_AUTO_CREATE_GROUPS', False)
 REMOTE_AUTH_AUTO_CREATE_USER = getattr(configuration, 'REMOTE_AUTH_AUTO_CREATE_USER', False)
 REMOTE_AUTH_BACKEND = getattr(configuration, 'REMOTE_AUTH_BACKEND', 'netbox.authentication.RemoteUserBackend')
@@ -177,6 +178,8 @@ SECRET_KEY = getattr(configuration, 'SECRET_KEY')  # Required
 SECURE_HSTS_INCLUDE_SUBDOMAINS = getattr(configuration, 'SECURE_HSTS_INCLUDE_SUBDOMAINS', False)
 SECURE_HSTS_PRELOAD = getattr(configuration, 'SECURE_HSTS_PRELOAD', False)
 SECURE_HSTS_SECONDS = getattr(configuration, 'SECURE_HSTS_SECONDS', 0)
+SECURE_PROXY_SSL_HEADER = getattr(configuration, 'SECURE_PROXY_SSL_HEADER', None)
+USE_X_FORWARDED_HOST = getattr(configuration, 'USE_X_FORWARDED_HOST', False)
 SECURE_SSL_REDIRECT = getattr(configuration, 'SECURE_SSL_REDIRECT', False)
 SENTRY_CONFIG = getattr(configuration, 'SENTRY_CONFIG', {})
 # TODO: Remove in NetBox v4.5
@@ -556,8 +559,6 @@ USE_I18N = TRANSLATION_ENABLED
 
 # WSGI
 WSGI_APPLICATION = 'netbox.wsgi.application'
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-USE_X_FORWARDED_HOST = True
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # Static files (CSS, JavaScript, Images)
